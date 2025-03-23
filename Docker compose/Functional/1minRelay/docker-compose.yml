@@ -1,0 +1,31 @@
+# From https://github.com/kokofixcomputers/1min-relay and adjusted not to need to clone git first. Be sure to adjust the models env section for what you're wanting
+
+services:
+  # Memcached for storing rate-limits data.
+  memcached:
+    build: https://github.com/kokofixcomputers/1min-relay
+    image: memcached:latest
+    networks:
+      - 1min-relay-network
+    restart: unless-stopped
+    # Does not require to expose port. Only used for internal communication.
+  # 1min-relay
+  1min-relay:
+    build: https://github.com/kokofixcomputers/1min-relay.git
+    image: kokofixcomputers/1min-relay:latest
+    container_name: 1min-relay-container
+    ports:
+      - "5001:5001"
+    networks:
+      - 1min-relay-network
+    depends_on:
+      - memcached
+    environment:
+      # Use comma-separated string for ONE_MIN_AVAILABLE_MODELS Default: "mistral-small-latest", "gpt-4o", "deepseek-r1"
+      - SUBSET_OF_ONE_MIN_PERMITTED_MODELS=mistral-nemo,gpt-4o-mini,deepseek-chat
+      # Set your boolean as "True" or "False" for PERMIT_MODELS_FROM_SUBSET_ONLY Default: False
+      - PERMIT_MODELS_FROM_SUBSET_ONLY=False
+    restart: unless-stopped
+
+networks:
+  1min-relay-network:  # Define the custom network:

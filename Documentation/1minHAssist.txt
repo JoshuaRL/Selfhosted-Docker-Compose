@@ -1,0 +1,20 @@
+This is how I have 1minAI service with any model offered running on Home Assistant Assist.
+
+First, I got 1minRelay running in docker compose from here:  https://github.com/kokofixcomputers/1min-relay
+
+This allows for all of their allowed models to be used through a OpenAI compatible relay. There's some setup, and I have it running through docker compose. You can find my slightly adjusted version in my docs.
+
+My setup is kinda specific. I use Cosmos Cloud for certain parts of my stack, for the security, certs, and user auth. But it basically is docker/docker compose under the hood. That makes most things a lot easier but certain things more complex.
+
+I ran the 1minAIRelay as a docker compose, and if you look on the Relay GitHub issues you'll see my slight adjustment to make that pull without doing a git-merge or download first. With that running, and HA running in docker as well, I needed Extended OpenAI Conversation HA component:
+https://github.com/jekalmin/extended_openai_conversation
+
+However, that's not availablein the services to add, it's only installed in Home Assistant Community Store (HACS)
+That required some complexity to get HACS running in docker, but is possible through ssh-ing into the box instead of the GUI frontend:
+https://www.simplysmart.house/blog/how-to-install-HACS-on-home-assistant-Docker
+
+Once HACS was installed and updated, I could get Extended OpenAI Conversation installed. Just a note that I found it necessary to make the docker containers networks connected, and then make the URL I connected it to be the one that shows when I launched my Relay page. For me that was:  172.16.1.3:5001/v1  but that's good because it keeps stuff internal until it's not.
+
+For EOC the first connection UI is VERY simple, just like URL and API or something, but if you go back in you can edit all kinds of settings like the prompt, model, context, etc. You can also set up multiple connections in there so if you want to set up one for Relay, one for local Ollama, one for something else, you can. You could also set up one for each model you want through Relay, or different prompts, so that's cool. Error handling isn't the best but save and test, see what's up.
+
+From here I can run Home Assistant Assist and have any 1minAI model run, pretty cool frontend. And after doing all this work, you can add other services through this method as well, like any other OpenAi compatible service.

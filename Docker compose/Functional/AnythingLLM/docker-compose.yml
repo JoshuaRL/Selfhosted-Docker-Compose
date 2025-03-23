@@ -1,0 +1,49 @@
+# This assumes you have a local Ollama running. Change env section for other settings.
+
+version: '3.8'
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm
+    container_name: anythingllm
+    ports:
+    - "3001:3001"
+    cap_add:
+      - SYS_ADMIN
+    environment:
+    # Adjust for your environment
+      - STORAGE_DIR=/app/server/storage
+      - JWT_SECRET="string of more than 20 characters all random"
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_PATH=http://127.0.0.1:11434
+      - OLLAMA_MODEL_PREF=llama2
+      - OLLAMA_MODEL_TOKEN_LIMIT=4096
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_BASE_PATH=http://127.0.0.1:11434
+      - EMBEDDING_MODEL_PREF=nomic-embed-text:latest
+      - EMBEDDING_MODEL_MAX_CHUNK_LENGTH=8192
+      - VECTOR_DB=lancedb
+      - WHISPER_PROVIDER=local
+      - TTS_PROVIDER=native
+      - PASSWORDMINCHAR=8
+      # COMMUNITY_HUB_BUNDLE_DOWNLOADS_ENABLED=allow_all
+      # LLM_PROVIDER='gemini'
+      # GEMINI_API_KEY={{Google Gemini API Key goes here}}
+      # GEMINI_LLM_MODEL_PREF='gemini-2.0-flash-exp'
+      # LLM_PROVIDER='ollama-1minAIRelay' This is an example of some super special LLM provider
+      # OLLAMA_BASE_PATH='http://host.docker.internal:5001/V1'
+      # OLLAMA_MODEL_PREF='mistral-small-latest'
+      # OLLAMA_MODEL_TOKEN_LIMIT=8192
+      # OLLAMA_AUTH_TOKEN='nunhuh, this is my token'
+      # Add any other keys here for services or settings
+      # you can find in the docker/.env.example file
+    volumes:
+      - anythingllm_storage:/app/server/storage
+    restart: always
+
+volumes:
+  anythingllm_storage:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/anythingllm
